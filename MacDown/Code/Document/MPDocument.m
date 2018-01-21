@@ -736,11 +736,19 @@ static void (^MPGetPreviewLoadingCompletionHandler(MPDocument *doc))()
     {
         [self indent:nil];
         return NO;
-    }
-    else if (self.preferences.editorConvertTabs)
-    {
-        [textView insertSpacesForTab];
+    } else {
+      const NSRange lineRange = [textView.string paragraphRangeForRange:textView.selectedRange];
+      NSString *const line = [[textView.string substringWithRange:lineRange] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+      if ([line matchesForPattern:@"^(([0-9]\\.)|([\\*\\-\\+])) \\S"].count > 0)
+      {
+        [self indent:nil];
         return NO;
+      }
+      else if (self.preferences.editorConvertTabs)
+      {
+          [textView insertSpacesForTab];
+          return NO;
+      }
     }
     return YES;
 }
